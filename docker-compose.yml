@@ -1,0 +1,37 @@
+version: "3.3"
+services:
+  search:
+    image: "getmeili/meilisearch:v0.18.1"
+    volumes:
+      - "./data.ms:/data.ms"
+      - "inputs:/inputs"
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+      MEILI_NO_SENTRY: "true"
+    ports:
+      - "7700:7700"
+  ocr:
+    build: "./ocr"
+    volumes:
+      - "./ocr:/work"
+      - "inputs:/inputs"
+    environment:
+      DELAY: "10" # in minutes
+    depends_on:
+      - search
+  ui:
+    build: "./ui"
+    volumes:
+      - "inputs:/inputs"
+    ports:
+      - "8765:8765"
+    depends_on:
+      - search
+      - ocr
+volumes:
+  inputs:
+    driver: "local"
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "" # full path to screenshots folder
