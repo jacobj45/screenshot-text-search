@@ -24,6 +24,7 @@ from types import ModuleType
 from typing import Any, BinaryIO, Dict, Generator, List, Optional, Tuple, Union
 from urllib.parse import quote, urljoin
 
+import meilisearch
 from pathvalidate import sanitize_filename, sanitize_filepath
 from typing_extensions import Literal, TypedDict
 
@@ -356,6 +357,7 @@ class Connector:
                     "WARNING: failed to create thumbnail folder "
                     "due to permission denied, it will be disabled."
                 )
+        self.meili_client = None
 
     def run(
         self, http_request: Dict[str, Any]
@@ -1504,22 +1506,17 @@ class Connector:
 
         mimes = self._request.get(API_MIMES)
 
+        if self.meili_client is None:
+            self.meili_client = meilisearch.Client('http://search:7700')
+            self.meili_index = self.meili_client.index('screenshots')
+
         result = []
         query = self._request[API_Q]
-        for root, dirs, files in os.walk(search_path):
-            for fil in files:
-                if query.lower() in fil.lower():
-                    file_path = os.path.join(root, fil)
-                    if mimes is None:
-                        result.append(self._info(file_path))
-                    else:
-                        if _mimetype(file_path) in mimes:
-                            result.append(self._info(file_path))
-            if mimes is None:
-                for folder in dirs:
-                    file_path = os.path.join(root, folder)
-                    if query.lower() in folder.lower():
-                        result.append(self._info(file_path))
+        rs = self.meili_index.search(query.lower(), opt_params={'attributesToRetrieve': ['name'], 'limit': 1_000_000_000})
+        for r in rs['hits']:
+            filename = r['name']
+            file_path = '/inputs/' + filename
+            result.append(self._info(file_path))
         self._response[R_FILES] = result
 
     def _cwd(self, path: str) -> None:

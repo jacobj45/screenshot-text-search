@@ -185,7 +185,36 @@
                         // to enable preview with Microsoft Office Online Viewer
                         // these MIME types override "googleDocsMimes"
                         officeOnlineMimes: ['application/vnd.ms-office', 'application/msword', 'application/vnd.ms-word', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.oasis.opendocument.text', 'application/vnd.oasis.opendocument.spreadsheet', 'application/vnd.oasis.opendocument.presentation']
-                    }
+                    },
+                    search: {
+                        // Incremental search from the current view
+                        incsearch: {
+                            enable: false, // is enable true or false
+                            minlen: 1,    // minimum number of characters
+                            wait: 500   // wait milliseconds
+                        },
+                        // // Additional search types
+                        // searchTypes : {
+                        //     // "SearchMime" is implemented in default
+                        //     SearchMime : {           // The key is search type that send to the connector
+                        //         name : 'btnMime',    // Button text to be processed in i18n()
+                        //         title : 'searchMime',// Button title to be processed in i18n()
+                        //         incsearch : 'mime'   // Incremental search target filed name of the file object
+                        //         // Or Callable function
+                        //         /* incsearch function example
+                        //         function(queryObject, cwdHashes, elFinderInstance) {
+                        //             var q = queryObject.val;
+                        //             var regex = queryObject.regex;
+                        //             var matchedHashes = $.grep(cwdHashes, function(hash) {
+                        //                 var file = elFinderInstance.file(hash);
+                        //                 return (file && file.mime && file.mime.match(regex))? true : false;
+                        //             });
+                        //             return matchedHashes;
+                        //         }
+                        //         */
+                        //     }
+                        // }
+                    },
                 }
             },
             managers: {
